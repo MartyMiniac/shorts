@@ -1,0 +1,22 @@
+{
+    "googlesearch": {
+        "users_authorized": [
+            "1941012661"
+        ],
+        "open_to_all": false,
+        "link": "https://www.google.com"
+    },
+    "test": {
+        "users_authorized": [],
+        "open_to_all": true,
+        "link": "https://www.fb.com"
+    },
+    "test2": {
+        "users_authorized": [
+            "1941012661",
+            "1941012663"
+        ],
+        "open_to_all": false,
+        "link": "https://www.w3schools.com/"
+    }
+}
