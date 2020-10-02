@@ -99,5 +99,22 @@ def submithandler():
     f.close()
     return str(js)
 
+@app.route('/changepass', methods=['POST'])
+def changepass():
+    regno=request.form['regno']
+    oldpass=request.form['oldpass']
+    newpass=request.form['newpass']
+    f=open('static/json/logins.json','r')
+    js=json.load(f)
+    f.close()
+    for s in js['users']:
+        if regno == s['regno'] and oldpass == s['pswd']:
+            s['pswd']=newpass            
+            f=open('static/json/logins.json','w')
+            f.write(json.dumps(js, indent=4))
+            return 'Success'
+    
+    return 'Failed'
+
 if __name__ == '__main__':
     app.run(debug=True)

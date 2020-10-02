@@ -18,5 +18,13 @@
         ],
         "open_to_all": false,
         "link": "https://www.w3schools.com/"
+    },
+    "justtesting": {
+        "users_authorized": [
+            "1941012800",
+            "1941012663"
+        ],
+        "open_to_all": false,
+        "link": "https://www.w3schools.com/jsref/prop_checkbox_checked.asp"
     }
 }

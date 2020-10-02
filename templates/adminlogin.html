@@ -6,7 +6,31 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Shorts</title>
 </head>
-<style>    
+<style>
+    #overlay
+    {
+        position: fixed;
+        display: none;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.9);
+        z-index: 2;
+    }    
+    .exitbutton
+    {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 100px;
+        height: auto;        
+        cursor: pointer;
+        z-index: 3;
+        font-size: xx-large;
+    }
     body, html
     {
         height: 100%;
@@ -115,6 +139,28 @@
         color: white;
         font-size: 30px;
     }
+    .logincontain
+    { 
+        min-height: 200px;
+        min-width: 300px;
+        border-radius: 10px;        
+        box-shadow: 0 0 5px 10px #222;
+        background-color: #222;
+        margin: 30vh 30vw;
+        padding: 10px;
+        position: relative;
+    }
+    .logincontain h1
+    {
+        font-family: 'Source Sans Pro', sans-serif;
+        color: white;
+    }
+    #loginform
+    {
+        margin-left: 30%;
+        padding: 10px;
+        position: relative;
+    }
 </style>
 <body>
     <div class="wrapper">
@@ -124,7 +170,7 @@
             </h1>
         </div>
         <div class="optionpane">
-            <p id="changepswd" class="option">Change Password</p>
+            <p id="changepswd" class="option" onclick=on()>Change Password</p>
             <br>
             <p id="createlink" class="option">Create New Link</p>
             <br>
@@ -146,6 +192,23 @@
                 </form>
             </div>
         </div>
+        <div id="overlay">
+            <button onclick="off()" class="exitbutton">×</button>
+            <div class="logincontain">
+                <h1>Change Your Password</h1>
+                <form action="/changepass" method="POST" id="loginform">
+                    <input name="regno" type="text" size="25" placeholder="Enter your Registration Number">
+                    <br>
+                    <input name="oldpass" id="formpassword" type="password" size="25" placeholder="Enter your old Password">
+                    <button id="showhide">Show</button>
+                    <br>
+                    <input name="newpass" id="formpasswordcnfm" type="password" size="25" placeholder="Enter your new Password">
+                    <button id="showhidecnfm">Show</button>
+                    <br>
+                    <input type="submit" value="Change Password">
+                </form>
+            </div>
+        </div>
     </div>
 </body>
 <script>
@@ -155,9 +218,8 @@
             var txt="<p class=\"studentlisttitle\">Student List</p>";
             for(i=0; i<data.users.length; i++)
             {
-                txt+="<p class=\"studentlist\"><input type=\"checkbox\" name=\"students\" value="+data.users[i]+">"+data.users[i]+"</p>";
+                txt+="<p class=\"studentlist\" onclick=studentlisthandle(event) custom="+data.users[i]+"><input type=\"checkbox\" name=\"students\" id="+data.users[i]+" value="+data.users[i]+">"+data.users[i]+"</p>";
             }
-            console.log(txt);
             document.getElementById("studentlist").innerHTML=txt;
         });
     });
@@ -166,6 +228,67 @@
             document.getElementById("studentlist").style.display="none";
         else
             document.getElementById("studentlist").style.display="block";
+    });
+    function studentlisthandle(e){
+        var checkid=e.target.childNodes[0].id;
+        var checktrue=e.target.childNodes[0].checked;
+        if(checktrue)
+        {
+            document.getElementById(checkid).checked=false;
+        }
+        else
+        {
+            document.getElementById(checkid).checked=true;
+        }
+    }
+    function on() {
+        $('#overlay').fadeIn();
+    }
+    function off() {
+        $('#overlay').fadeOut();
+    }
+</script>
+
+<script>
+    var show=false;
+    var showcnfm=false;
+    document.getElementById("showhide").addEventListener("click", function(event){
+        if(show==false)
+        {
+            document.getElementById("showhide").innerHTML="Hide";
+            document.getElementById("formpassword").type="text";
+            show=true;
+        }
+        else
+        {
+            document.getElementById("showhide").innerHTML="Show";
+            document.getElementById("formpassword").type="password";
+            show=false;
+        }
+        event.preventDefault();
+    });
+    
+    document.getElementById("showhidecnfm").addEventListener("click", function(event){
+        if(show==false)
+        {
+            document.getElementById("showhidecnfm").innerHTML="Hide";
+            document.getElementById("formpasswordcnfm").type="text";
+            show=true;
+        }
+        else
+        {
+            document.getElementById("showhidecnfm").innerHTML="Show";
+            document.getElementById("formpasswordcnfm").type="password";
+            show=false;
+        }
+        event.preventDefault();
+    });
+    document.getElementById("loginform").addEventListener("keypress", function(event){
+        if(event.keyCode==13)
+        {
+            document.getElementById("loginform").submit();
+            document.getElementById("showhide").click();
+        }
     });
 </script>
 </html>
