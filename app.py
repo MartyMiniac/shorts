@@ -98,6 +98,7 @@ def submithandler():
     f=open('static/json/sitelist.json','w')
     f.write(json.dumps(js, indent=4))
     f.close()
+    updatedb('sitelist.json')
     return str(js)
 
 @app.route('/changepass', methods=['POST'])
@@ -113,9 +114,35 @@ def changepass():
             s['pswd']=newpass            
             f=open('static/json/logins.json','w')
             f.write(json.dumps(js, indent=4))
+            f.close()
+            updatedb('logins.json')
             return 'Success'
     
     return 'Failed'
+
+def updatedb(s):
+    js={
+        "sitelist.json" : "5f7729a173d1b37e00027365",
+        "logins.json" : "5f77298373d1b37e00027361",
+        "admins.json" : "5f77295c73d1b37e0002735c"
+    }
+
+    url = "https://codexshorts-d55b.restdb.io/rest/basic/"+js[s]
+
+    f=open('static\json\\'+s,'r')
+    tmp=json.load(f)
+    payload = {"value":json.dumps(tmp, indent=4)}
+    print(payload)
+    f.close()
+    headers = {
+        'content-type': "application/json",
+        'x-apikey': "3efcf6caf6e519b2a48b14b7bc92c627887dd",
+        'cache-control': "no-cache"
+        }
+
+    response = requests.request("PUT", url, data=json.dumps(payload), headers=headers)
+
+    print(response.text)
 
 if __name__ == '__main__':
     url = "https://codexshorts-d55b.restdb.io/rest/basic"
