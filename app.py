@@ -99,7 +99,7 @@ def submithandler():
     f.write(json.dumps(js, indent=4))
     f.close()
     updatedb('sitelist.json')
-    return str(js)
+    return ('',204)
 
 @app.route('/changepass', methods=['POST'])
 def changepass():
@@ -116,9 +116,9 @@ def changepass():
             f.write(json.dumps(js, indent=4))
             f.close()
             updatedb('logins.json')
-            return 'Success'
+            return render_template('msgtimed.html',title='Password Changed', msg='Password Changed Successfully please Relogin using new Password')
     
-    return 'Failed'
+    return render_template('msgtimed.html',title='Password Not Changed', msg='There was an Error. Your Regno or old password would be Wrong. Please Relogin using new Password')
 
 def updatedb(s):
     js={
@@ -163,4 +163,5 @@ if __name__ == '__main__':
         f=open('static\json\\'+s['name'],'w')
         f.write(json.dumps(s['value'], indent=4))
         f.close()
+
     app.run(debug=True)
