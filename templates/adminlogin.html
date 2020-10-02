@@ -213,15 +213,22 @@
 </body>
 <script>
     document.getElementById("createlink").addEventListener("click", function(event){
-        document.getElementById("linkoptions").style.display="block";
-       $.getJSON('/getloginslist',function(data){
-            var txt="<p class=\"studentlisttitle\">Student List</p>";
-            for(i=0; i<data.users.length; i++)
-            {
-                txt+="<p class=\"studentlist\" onclick=studentlisthandle(event) custom="+data.users[i]+"><input type=\"checkbox\" name=\"students\" id="+data.users[i]+" value="+data.users[i]+">"+data.users[i]+"</p>";
-            }
-            document.getElementById("studentlist").innerHTML=txt;
-        });
+        if(document.getElementById("linkoptions").style.display=="none")
+        {
+            document.getElementById("linkoptions").style.display="block";
+            $.getJSON('/getloginslist',function(data){
+                var txt="<p class=\"studentlisttitle\">Student List</p>";
+                for(i=0; i<data.users.length; i++)
+                {
+                    txt+="<p class=\"studentlist\" onclick=studentlisthandle(event) custom="+data.users[i]+"><input type=\"checkbox\" name=\"students\" id="+data.users[i]+" value="+data.users[i]+">"+data.users[i]+"</p>";
+                }
+                document.getElementById("studentlist").innerHTML=txt;
+            });
+        }
+        else
+        {
+            document.getElementById("linkoptions").style.display="none";
+        }
     });
     document.getElementById("linkvisible").addEventListener("change", function(event){
         if(document.getElementById("linkvisible").value=="yes")

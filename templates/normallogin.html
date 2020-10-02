@@ -3,9 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Shorts</title>
 </head>
-<style>    
+<style>
+    #overlay
+    {
+        position: fixed;
+        display: none;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.9);
+        z-index: 2;
+    }    
+    .exitbutton
+    {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 100px;
+        height: auto;        
+        cursor: pointer;
+        z-index: 3;
+        font-size: xx-large;
+    }
     body, html
     {
         height: 100%;
@@ -48,13 +73,81 @@
             display: inline;
         }
     }
-    .infohead
-    {
-        padding: 10px;
+    .optionpane
+    {        
+        margin: auto;
+        margin-top: 100px;
+        min-height: 125px;
+        max-width: 475px;
+        background-image: linear-gradient(43deg, #ffdee9, #b5fffc);
+        border-radius: 10px;
+        padding: 25px;
+        text-align: center;
     }
-    .infopara
+    
+    @media only screen and (max-width: 500px)
     {
+        .optionpane
+        {
+            margin: auto;
+            margin-top: 50px;
+            min-height: 125px;
+            max-width: 475px;
+            background-image: linear-gradient(43deg, #ffdee9, #b5fffc);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+        }
+    }
+    .option
+    {
+        background-image: linear-gradient(#382929,#9c3f3f);
+        margin-top: 20px;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+        transition: 1s;
+    }
+    .option:hover
+    {            
+        border-radius: 50%;
+    }
+    @media only screen and (max-width: 500px)
+    {
+        .option
+        {
+            background-image: linear-gradient(#382929,#9c3f3f);
+            margin-top: 2px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+        .option:hover
+        {            
+            background-image: linear-gradient(180deg,#382929,#9c3f3f);
+        }
+    }
+    .logincontain
+    { 
+        min-height: 200px;
+        min-width: 300px;
+        border-radius: 10px;        
+        box-shadow: 0 0 5px 10px #222;
+        background-color: #222;
+        margin: 30vh 30vw;
         padding: 10px;
+        position: relative;
+    }
+    .logincontain h1
+    {
+        font-family: 'Source Sans Pro', sans-serif;
+        color: white;
+    }
+    #loginform
+    {
+        margin-left: 30%;
+        padding: 10px;
+        position: relative;
     }
 </style>
 <body>
@@ -64,10 +157,77 @@
                 Shorts
             </h1>
         </div>
-        <h1 class="infohead">Normal Login</h1>
-        <p class="infopara">
-            placeholder
-        </p>
+        <div class="optionpane">
+            <p id="changepswd" class="option" onclick=on()>Change Password</p>
+        </div>
+        <div id="overlay">
+            <button onclick="off()" class="exitbutton">×</button>
+            <div class="logincontain">
+                <h1>Change Your Password</h1>
+                <form action="/changepass" method="POST" id="loginform">
+                    <input name="regno" type="text" size="25" placeholder="Enter your Registration Number">
+                    <br>
+                    <input name="oldpass" id="formpassword" type="password" size="25" placeholder="Enter your old Password">
+                    <button id="showhide">Show</button>
+                    <br>
+                    <input name="newpass" id="formpasswordcnfm" type="password" size="25" placeholder="Enter your new Password">
+                    <button id="showhidecnfm">Show</button>
+                    <br>
+                    <input type="submit" value="Change Password">
+                </form>
+            </div>
+        </div>
     </div>
 </body>
+<script>
+    function on() {
+        $('#overlay').fadeIn();
+    }
+    function off() {
+        $('#overlay').fadeOut();
+    }
+</script>
+
+<script>
+    var show=false;
+    var showcnfm=false;
+    document.getElementById("showhide").addEventListener("click", function(event){
+        if(show==false)
+        {
+            document.getElementById("showhide").innerHTML="Hide";
+            document.getElementById("formpassword").type="text";
+            show=true;
+        }
+        else
+        {
+            document.getElementById("showhide").innerHTML="Show";
+            document.getElementById("formpassword").type="password";
+            show=false;
+        }
+        event.preventDefault();
+    });
+    
+    document.getElementById("showhidecnfm").addEventListener("click", function(event){
+        if(show==false)
+        {
+            document.getElementById("showhidecnfm").innerHTML="Hide";
+            document.getElementById("formpasswordcnfm").type="text";
+            show=true;
+        }
+        else
+        {
+            document.getElementById("showhidecnfm").innerHTML="Show";
+            document.getElementById("formpasswordcnfm").type="password";
+            show=false;
+        }
+        event.preventDefault();
+    });
+    document.getElementById("loginform").addEventListener("keypress", function(event){
+        if(event.keyCode==13)
+        {
+            document.getElementById("loginform").submit();
+            document.getElementById("showhide").click();
+        }
+    });
+</script>
 </html>
