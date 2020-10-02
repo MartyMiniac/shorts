@@ -1,5 +1,6 @@
 from flask import *
 import json
+import requests
 
 app=Flask(__name__)
 
@@ -117,4 +118,22 @@ def changepass():
     return 'Failed'
 
 if __name__ == '__main__':
+    url = "https://codexshorts-d55b.restdb.io/rest/basic"
+
+    f=open('restdbkey.txt','r')
+    key=f.read()
+    f.close()
+    headers = {
+        'content-type': "application/json",
+        'x-apikey': key,
+        'cache-control': "no-cache"
+        }
+
+    response = requests.request("GET", url, headers=headers)
+
+    tmpjson=json.loads(response.text)
+    for s in tmpjson:
+        f=open('static\json\\'+s['name'],'w')
+        f.write(json.dumps(s['value'], indent=4))
+        f.close()
     app.run(debug=True)
