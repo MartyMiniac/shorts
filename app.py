@@ -22,9 +22,15 @@ def index():
                 f.close()
 
                 if regno in adjs['users']:
-                    return render_template('adminlogin.html')
-                else:
-                    return render_template('normallogin.html')
+                    res=make_response(render_template('adminlogin.html'))
+                    res.set_cookie('regno',regno)
+                    res.set_cookie('pswd',pswd)
+                    return res
+                else:                    
+                    res=make_response(render_template('normallogin.html'))
+                    res.set_cookie('regno',regno)
+                    res.set_cookie('pswd',pswd)
+                    return res
         return render_template('index.html', loginfailed=True)
     else:
         return render_template('index.html')
@@ -54,8 +60,11 @@ def accesssite(site):
                     return redirect(sitelistjson[site]['link'])
                 else:
                     return render_template('accessdenied.html')
-        return render_template('index.html', loginfailed=True)
+        return render_template('accesslogin.html', loginfailed=True)
     else:
+        regno=request.cookies.get('regno')
+        pswd=request.cookies.get('pswd')
+
         f=open('static/json/sitelist.json', 'r')
         sitelistjson=json.load(f)
         f.close()
@@ -64,12 +73,28 @@ def accesssite(site):
             if sitelistjson[site]['open_to_all']:
                 return redirect(sitelistjson[site]['link'])
             else:
+                if checkLogin(regno, pswd) and regno!=None:
+                    f=open('static/json/sitelist.json', 'r')
+                    sitelistjson=json.load(f)
+                    f.close()
+
+                    if regno in sitelistjson[site]['users_authorized']:
+                        return redirect(sitelistjson[site]['link'])
+                    else:
+                        return render_template('accessdenied.html')
+
                 return render_template('accesslogin.html')
 
         return render_template('404.html')
 
 @app.route('/getloginslist')
 def getloginslist():
+    regno=request.cookies.get('regno')
+    pswd=request.cookies.get('pswd')
+
+    if checkLogin(regno, pswd) == False or checkAdmin(regno)==False:
+        return render_template('msgtimed.html', title='Authentication Failure', msg='Sever is Unable to resolve who you are due to password change or deletion of cookie. Please Login Again')
+
     f=open('static/json/logins.json','r')
     js=json.load(f)
     f.close()
@@ -83,6 +108,12 @@ def getloginslist():
 
 @app.route('/urlsubmithandler', methods=['POST'])
 def submithandler():
+    regno=request.cookies.get('regno')
+    pswd=request.cookies.get('pswd')
+
+    if checkLogin(regno, pswd) == False or checkAdmin(regno)==False:
+        return render_template('msgtimed.html', title='Authentication Failure', msg='Sever is Unable to resolve who you are due to password change or deletion of cookie. Please Login Again')
+
     print(request.form.getlist('students'))
     f=open('static/json/sitelist.json','r')
     js=json.load(f)
@@ -103,7 +134,12 @@ def submithandler():
 
 @app.route('/changepass', methods=['POST'])
 def changepass():
-    regno=request.form['regno']
+    regno=request.cookies.get('regno')
+    pswd=request.cookies.get('pswd')
+
+    if checkLogin(regno, pswd) == False:
+        return render_template('msgtimed.html', title='Authentication Failure', msg='Sever is Unable to resolve who you are due to password change or deletion of cookie. Please Login Again')
+
     oldpass=request.form['oldpass']
     newpass=request.form['newpass']
     f=open('static/json/logins.json','r')
@@ -143,6 +179,28 @@ def updatedb(s):
     response = requests.request("PUT", url, data=json.dumps(payload), headers=headers)
 
     print(response.text)
+
+def checkLogin(regno, pswd):
+    f=open('static/json/logins.json')
+    js=json.load(f)
+    f.close()
+
+    for s in js['users']:
+        if s['regno']==regno and s['pswd']==pswd:
+            return True
+    
+    return False
+
+def checkAdmin(regno):
+    f=open('static/json/admins.json')
+    js=json.load(f)
+    f.close()
+
+    for s in js['users']:
+        if s==regno:
+            return True
+    
+    return False
 
 if __name__ == '__main__':
     url = "https://codexshorts-d55b.restdb.io/rest/basic"
