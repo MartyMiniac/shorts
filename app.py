@@ -132,6 +132,72 @@ def submithandler():
     updatedb('sitelist.json')
     return ('',204)
 
+@app.route('/sitemanagerhtml')
+def sitemanagerpage():
+    regno=request.cookies.get('regno')
+    pswd=request.cookies.get('pswd')
+    if regno==None or checkLogin(regno,pswd)==False or checkAdmin(regno)==False:
+        return jsonify({'Error':'Authentication Failure'})
+    return render_template('sitemanage.html')
+
+@app.route('/deletesitelisting', methods=['POST'])
+def deletesitelisting():
+    regno=request.cookies.get('regno')
+    pswd=request.cookies.get('pswd')
+
+    if checkLogin(regno, pswd) == False or checkAdmin(regno)==False:
+        return render_template('msgtimed.html', title='Authentication Failure', msg='Sever is Unable to resolve who you are due to password change or deletion of cookie. Please Login Again')
+    sname=request.form['sitename']
+    f=open('static/json/sitelist.json','r')
+    js=json.load(f)
+    f.close()
+
+    del js[sname]
+
+    f=open('static/json/sitelist.json','w')
+    f.write(json.dumps(js, indent=4))
+    f.close()
+
+    updatedb('sitelist.json')
+    return 'Done!!'
+
+@app.route('/sitemanager', methods=['GET', 'POST'])
+def sitemanager():
+    if request.method=='POST':
+        
+        regno=request.cookies.get('regno')
+        pswd=request.cookies.get('pswd')
+
+        if checkLogin(regno, pswd) == False or checkAdmin(regno)==False:
+            return render_template('msgtimed.html', title='Authentication Failure', msg='Sever is Unable to resolve who you are due to password change or deletion of cookie. Please Login Again')
+
+        f=open('static/json/sitelist.json','r')
+        js=json.load(f)
+        f.close()
+
+        js[request.form['key']]['open_to_all']=request.form['open_to_all']=='yes'
+        if js[request.form['key']]['open_to_all']==False:
+            js[request.form['key']]['users_authorized']=request.form.getlist('students')
+        js[request.form['key']]['link']=request.form['url']
+        
+        f=open('static/json/sitelist.json','w')
+        f.write(json.dumps(js, indent=4))
+        f.close()
+
+        updatedb('sitelist.json')
+        return redirect('/sitemanagerhtml')
+    else:
+        regno=request.cookies.get('regno')
+        pswd=request.cookies.get('pswd')
+        if regno==None or checkLogin(regno,pswd)==False or checkAdmin(regno)==False:
+            return jsonify({'Error':'Authentication Failure'})
+        else:
+            f=open('static/json/sitelist.json','r')
+            js=json.load(f)
+            f.close()
+            return jsonify(js)
+        
+
 @app.route('/changepass', methods=['POST'])
 def changepass():
     regno=request.cookies.get('regno')

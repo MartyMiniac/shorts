@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Shorts</title>
+</head>
+<style>  
+    #overlay
+    {
+        position: fixed;
+        display: none;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.9);
+        z-index: 2;
+    }
+    .exitbutton
+    {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 100px;
+        height: auto;        
+        cursor: pointer;
+        z-index: 3;
+        font-size: xx-large;
+    }
+    body, html
+    {
+        height: 100%;
+        margin: 0;
+    }
+    .head
+    {
+        background-image: linear-gradient(43deg, #ffdee9, #b5fffc);
+        border: 0;
+        margin: 0;
+        margin-left: 1%;
+        margin-right: 1%;
+        border-radius: 10px;
+        text-align: center;
+    }
+    .wrapper
+    {
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(90deg, #868686, #d8d8d8);
+        margin: 0;
+        border: 0;
+    }
+    .heading
+    {
+        font-family: 'Source Sans Pro', sans-serif;
+        text-transform: uppercase;
+        font-size: 54px;
+        color: #28232e;
+        display: inline;
+    }
+    @media only screen and (max-width: 450px)
+    {
+        .heading
+        {
+            font-family: 'Source Sans Pro', sans-serif;
+            text-transform: uppercase;
+            font-size: 30px;
+            color: #28232e;
+            display: inline;
+        }
+    }
+    .logindiv
+    {
+        margin: auto;
+        margin-top: 100px;
+        min-height: 125px;
+        max-width: 475px;
+        background-image: linear-gradient(43deg, #ffdee9, #b5fffc);
+        border-radius: 10px;
+        padding: 25px;
+    }
+    .logindiv h1
+    {
+        color: #474747;
+        font-family: 'Source Sans Pro', sans-serif;
+        text-transform: uppercase;
+        text-align: center;
+    }
+    .logindiv p
+    {
+        text-align: center;
+    }
+    @media only screen and (max-width: 500px)
+    {
+        .logindiv
+        {
+            margin: auto;
+            margin-top: 50px;
+            min-height: 125px;
+            max-width: 475px;
+            background-image: linear-gradient(43deg, #ffdee9, #b5fffc);
+            border-radius: 10px;
+            padding: 25px;
+        }
+    }
+    .option
+    {
+        background-image: linear-gradient(#382929,#9c3f3f);
+        margin-top: 20px;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+        transition: 1s;
+    }
+    .option:hover
+    {            
+        border-radius: 50%;
+    }
+    .logincontain
+    { 
+        max-height: 300px;
+        min-width: 300px;
+        border-radius: 10px;        
+        box-shadow: 0 0 5px 10px #222;
+        background-color: #222;
+        margin: 30vh 30vw;
+        padding: 10px;
+        position: relative;
+        overflow: auto;
+    }
+    @media only screen and (max-width: 500px)
+    {
+        .logincontain
+        { 
+            max-height: 400px;
+            min-width: 300px;
+            border-radius: 10px;        
+            box-shadow: 0 0 5px 10px #222;
+            background-color: #222;
+            margin: 30vh 0vw;
+            padding: 10px;
+            position: relative;
+            overflow-y: auto;
+        }
+    }
+    .logincontain h1
+    {
+        font-family: 'Source Sans Pro', sans-serif;
+        color: white;
+        text-align: center;
+    }
+    .logincontain label
+    {
+        font-family: 'Source Sans Pro', sans-serif;
+        color: white;
+        font-size: small;
+    }
+    .studentlist
+    {
+        background-color: white;
+        cursor: pointer;
+    }
+    .studentlisttitle
+    {
+        background-color: rgb(204, 204, 204);
+    }
+</style>
+<body>
+    <div class="wrapper">
+        <div class="head">
+            <h1 class="heading">
+                Shorts
+            </h1>
+        </div>
+        <div class="logindiv" id="listofsite">
+            <h1>Site List</h1>
+        </div>
+        <div id="overlay">
+            <button onclick="off()" class="exitbutton">×</button>
+            <div class="logincontain">
+                <h1 id="headname">dsds</h1>
+                <form action="/sitemanager" method="POST" id="loginform">
+                    <input name="link" id="link" type="text" size="25" placeholder="Enter the shortened link">
+                    <br>
+                    <input name="url" id="url" type="text" size="25" placeholder="Enter the Original Link">
+                    <br>
+                    <input type="submit" value="Update URL">
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var js;
+    $.getJSON('/sitemanager',function(data){
+        var txt="";
+        js=data;
+        for(var i in data)
+        {
+            txt+="<p class=\"option\" id=\"siteid"+i+"\" onclick=on(event)>"+i+"</p><button id=\"del"+i+"\" onclick=deletesite(event)>Delete</button><br><br>"
+        }
+        document.getElementById("listofsite").innerHTML=txt;
+    });
+    function on(e) {
+        $('#overlay').fadeIn();        
+        var jsid=e.target.id;
+        var t=js[jsid.substring(6,jsid.length)];
+        txt="<input name=\"url\" id=\"url\" type=\"text\" size=\"50\" placeholder=\"Enter the Original Link\" value=\""+t["link"]+"\">";
+        txt+="<input name=\"key\" style=\"display: none\" value=\""+jsid.substring(6,jsid.length)+"\">";
+        txt+="<br>";
+        txt+="<label for=\"linkvisible\">Anyone can Open the Link:</label>";
+        txt+="<select id=\"linkvisible\" name=\"open_to_all\" onchange=studentvisible()>";
+        if(t["open_to_all"])
+        {
+            txt+="<option value=\"yes\" selected>Yes</option>";
+            txt+="<option value=\"no\">No</option>";
+        }
+        else
+        {
+            txt+="<option value=\"yes\">Yes</option>";
+            txt+="<option value=\"no\" selected>No</option>";
+        }
+        txt+="</select>";
+        txt+="<br>"
+        txt+="<div id=\"studentlist\" style=\"display: none\"></div>"
+        txt+="<br>"
+        
+        $.getJSON('/getloginslist',function(data){
+            var txt2="<p class=\"studentlisttitle\">Student List</p>";
+            for(i=0; i<data.users.length; i++)
+            {
+                txt2+="<p class=\"studentlist\" onclick=studentlisthandle(event) custom="+data.users[i]+"><input type=\"checkbox\" name=\"students\" id="+data.users[i]+" value="+data.users[i]+">"+data.users[i]+"</p>";
+            }
+            document.getElementById("studentlist").innerHTML=txt2;
+        });
+        
+        txt+="<input type=\"submit\" value=\"Update URL\">";
+        document.getElementById("loginform").innerHTML=txt;
+        document.getElementById("headname").innerHTML=jsid.substring(6,jsid.length);
+        if(t["open_to_all"]==false)
+        {
+            document.getElementById("studentlist").style.display="block";
+        }
+    }
+    function studentvisible()
+    {
+        if(document.getElementById("linkvisible").value=="yes")
+            document.getElementById("studentlist").style.display="none";
+        else
+            document.getElementById("studentlist").style.display="block";
+    }
+    function off() {
+        $('#overlay').fadeOut();
+    }
+    function deletesite(e){
+        var jsid=e.target.id;
+        $.post("/deletesitelisting",{
+            sitename : jsid.substring(3,jsid.length)
+        },
+        window.location.href='/sitemanagerhtml');
+    }
+    function studentlisthandle(e){
+        var checkid=e.target.childNodes[0].id;
+        var checktrue=e.target.childNodes[0].checked;
+        if(checktrue)
+        {
+            document.getElementById(checkid).checked=false;
+        }
+        else
+        {
+            document.getElementById(checkid).checked=true;
+        }
+    }
+</script>
+</html>
