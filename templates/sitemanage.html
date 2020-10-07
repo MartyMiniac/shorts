@@ -233,7 +233,14 @@
             var txt2="<p class=\"studentlisttitle\">Student List</p>";
             for(i=0; i<data.users.length; i++)
             {
-                txt2+="<p class=\"studentlist\" onclick=studentlisthandle(event) custom="+data.users[i]+"><input type=\"checkbox\" name=\"students\" id="+data.users[i]+" value="+data.users[i]+">"+data.users[i]+"</p>";
+                if(t['users_authorized'].includes(data.users[i]))
+                {
+                    txt2+="<p class=\"studentlist\" onclick=studentlisthandle(event) custom="+data.users[i]+"><input type=\"checkbox\" checked name=\"students\" id="+data.users[i]+" value="+data.users[i]+">"+data.users[i]+"</p>";
+                }
+                else
+                {
+                    txt2+="<p class=\"studentlist\" onclick=studentlisthandle(event) custom="+data.users[i]+"><input type=\"checkbox\" name=\"students\" id="+data.users[i]+" value="+data.users[i]+">"+data.users[i]+"</p>";
+                }
             }
             document.getElementById("studentlist").innerHTML=txt2;
         });
